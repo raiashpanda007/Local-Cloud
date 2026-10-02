@@ -1,8 +1,6 @@
 package cmd
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 var masterCmd = &cobra.Command{
 	Use:   "master",
@@ -13,9 +11,6 @@ across them.
 
 Workers advertise availability on the local network. Remote connectivity
 is planned for a later release.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Help()
-	},
 }
 
 func init() {

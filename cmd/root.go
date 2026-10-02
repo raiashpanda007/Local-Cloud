@@ -4,7 +4,10 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync/atomic"
 	"syscall"
+
+	"raiashpanda007/local-cloud-cli/cmd/core/env"
 
 	"github.com/spf13/cobra"
 )
@@ -24,17 +27,21 @@ on the local network, and execute assigned tasks.`,
 }
 
 func Execute() {
-	// This central context is the system wide context carrier.
-	centralCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	var finished atomic.Bool
 	go func() {
-		<-centralCtx.Done()
-		os.Exit(130)
+		<-ctx.Done()
+		if !finished.Load() {
+			env.Log.Debug("shutdown signal received")
+			os.Exit(130)
+		}
 	}()
 
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.ExecuteContext(ctx)
+	finished.Store(true)
+	if err != nil {
 		os.Exit(1)
 	}
 }
