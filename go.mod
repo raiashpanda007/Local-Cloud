@@ -6,6 +6,7 @@ require github.com/spf13/cobra v1.10.2
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/miekg/dns v1.1.27 // indirect

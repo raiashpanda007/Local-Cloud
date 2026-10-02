@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DOMAIN_NAME string = "local.cloud"
+	DOMAIN_NAME string = "local"
 )
 
 // Rightnow calling this temp daemon.
@@ -29,14 +29,20 @@ func Daemon(centralCtx context.Context, nodeType types.NODE_TYPE) {
 
 	defer cancel()
 
-	// Publish to mdns
-	if nodeType == types.MASTER_NODE_TYPE {
-		serviceName = "master"
+	var err error
+
+	switch nodeType {
+	case types.MASTER_NODE_TYPE:
+		env.Log.Debug("looking for workers", "protocol", serviceProtocol, "domain", DOMAIN_NAME)
+		err = service_networks.DiscoverWorkers(serviceProtocol, DOMAIN_NAME, centralCtx, errorCtx)
+	case types.WORKER_NODE_TYPE:
+		serviceName = "worker"
+		env.Log.Debug("publishing service", "service", serviceName, "protocol", serviceProtocol, "domain", DOMAIN_NAME)
+		err = service_networks.PublishServicemDNS(serviceName, serviceProtocol, DOMAIN_NAME, metaData, centralCtx, errorCtx)
+	default:
+		env.Log.Error("unknown node type", "node", nodeType)
+		os.Exit(1)
 	}
-
-	env.Log.Debug("publishing service", "service", serviceName, "protocol", serviceProtocol, "domain", DOMAIN_NAME)
-
-	err := service_networks.PublishServicemDNS(serviceName, serviceProtocol, DOMAIN_NAME, metaData, centralCtx, errorCtx)
 	if err != nil {
 		env.Log.Error("daemon failed", "err", err)
 		os.Exit(1)

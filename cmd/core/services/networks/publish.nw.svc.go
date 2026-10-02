@@ -7,6 +7,7 @@ import (
 	"raiashpanda007/local-cloud-cli/cmd/core/env"
 	service_nw_server "raiashpanda007/local-cloud-cli/cmd/core/services/networks/server"
 
+	"github.com/google/uuid"
 	"github.com/grandcat/zeroconf"
 )
 
@@ -16,6 +17,8 @@ func PublishServicemDNS(serviceName, serviceProtocol, domainName string, metadat
 		env.Log.Error("tcp listen failed", "err", err)
 		return err
 	}
+
+	serviceName += uuid.New().String()[:8]
 	defer listener.Close()
 
 	port := listener.Addr().(*net.TCPAddr).Port
@@ -30,5 +33,6 @@ func PublishServicemDNS(serviceName, serviceProtocol, domainName string, metadat
 
 	env.Log.Info("mdns service published", "service", serviceName, "protocol", serviceProtocol, "domain", domainName, "port", port)
 
-	return service_nw_server.MasterServer(listener, centralCtx, errorCtx)
+	return service_nw_server.WorkerServer(listener, centralCtx, errorCtx)
+
 }
