@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
-	"raiashpanda007/local-cloud-cli/cmd/core"
-	"raiashpanda007/local-cloud-cli/cmd/core/types"
 )
 
 var startCmd = &cobra.Command{
@@ -14,8 +14,7 @@ var startCmd = &cobra.Command{
 The master coordinates connected machines, discovers workers, manages
 connections, and distributes workloads.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		core.Daemon(cmd.Context(), types.MASTER_NODE_TYPE)
-		return nil
+		return errors.New("master does not run inside the cli")
 	},
 }
 
